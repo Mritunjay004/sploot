@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -6,13 +8,20 @@ const User = require("./models/user");
 const Article = require("./models/Article");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
 
-// MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/backend_assignment", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.set("strictQuery", false);
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.log(error.message);
+    process.exit(1);
+  }
+};
 
 // Signup
 app.post("/api/signup", async (req, res) => {
@@ -198,6 +207,8 @@ app.patch("/api/users/:userId", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });

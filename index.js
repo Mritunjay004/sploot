@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const User = require("./models/user");
-const Article = require("./models/Article");
+const Article = require("./models/article");
 
 const app = express();
 const PORT = process.env.PORT || 3000;

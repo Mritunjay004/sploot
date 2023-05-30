@@ -162,6 +162,42 @@ app.get("/api/articles", async (req, res) => {
   }
 });
 
+// Update User
+app.patch("/api/users/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { name, age } = req.body;
+    // if user exists
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name, age },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        statusCode: 404,
+        error: "Not Found",
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      statusCode: 200,
+      data: {
+        data: user,
+      },
+      message: "User profile updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      error: "Internal Server Error",
+      message: "An error occurred while updating the user profile",
+    });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });

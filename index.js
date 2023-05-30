@@ -3,17 +3,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const User = require("./models/user");
+const Article = require("./models/Article");
 
 const app = express();
 app.use(express.json());
 
-// MongoDB connection
+// MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/backend_assignment", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// Signup API
+// Signup
 app.post("/api/signup", async (req, res) => {
   try {
     const { email, password, name, age } = req.body;
@@ -56,7 +57,7 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-// Login API
+// Login
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -81,7 +82,7 @@ app.post("/api/login", async (req, res) => {
       });
     }
 
-    // Generate JWT token
+    // JWT token
     const token = jwt.sign({ userId: user._id }, "secret");
 
     res.status(200).json({
@@ -96,6 +97,46 @@ app.post("/api/login", async (req, res) => {
       statusCode: 500,
       error: "Internal Server Error",
       message: "An error occurred while logging in",
+    });
+  }
+});
+
+// Create Article
+app.post("/api/users/:userId/articles", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { title, description } = req.body;
+
+    // if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        statusCode: 404,
+        error: "Not Found",
+        message: "User not found",
+      });
+    }
+
+    // Creating new
+    const article = new Article({
+      title,
+      description,
+      author: user._id,
+    });
+    await article.save();
+
+    res.status(201).json({
+      statusCode: 201,
+      data: {
+        data: article,
+      },
+      message: "Article created successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      error: "Internal Server Error",
+      message: "An error occurred while creating the article",
     });
   }
 });

@@ -56,6 +56,50 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
+// Login API
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({
+        statusCode: 401,
+        error: "Unauthorized",
+        message: "Invalid email or password",
+      });
+    }
+
+    // for password check
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({
+        statusCode: 401,
+        error: "Unauthorized",
+        message: "Invalid email or password",
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, "secret");
+
+    res.status(200).json({
+      statusCode: 200,
+      data: {
+        token,
+      },
+      message: "Logged in successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      error: "Internal Server Error",
+      message: "An error occurred while logging in",
+    });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });

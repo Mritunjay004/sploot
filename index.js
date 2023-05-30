@@ -23,6 +23,12 @@ const connectDB = async () => {
   }
 };
 
+app.get("/", (req, res) => {
+  res.send({
+    message: "Welcome to the API",
+  });
+});
+
 // Signup
 app.post("/api/signup", async (req, res) => {
   try {

@@ -141,6 +141,27 @@ app.post("/api/users/:userId/articles", async (req, res) => {
   }
 });
 
+// Get all articles
+app.get("/api/articles", async (req, res) => {
+  try {
+    const articles = await Article.find().populate("author", "name");
+
+    res.status(200).json({
+      statusCode: 200,
+      data: {
+        data: articles,
+      },
+      message: "Articles retrieved successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      error: "Internal Server Error",
+      message: "An error occurred while retrieving the articles",
+    });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
